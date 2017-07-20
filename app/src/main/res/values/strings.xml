@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">WeatherApp</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="multiple_days_forecast_title">%d days</string>
+    <string name="today_forecast_title">Today</string>
+    <string name="tomorrow_forecast_title">Tomorrow</string>
+    <string name="label_city_name">City Name</string>
+
+    <string name="value_temperature" formatted="false">%d %s</string>
+    <string name="values_max_min" formatted="false">Day %1s - Night %2s</string>
+
+</resources>
