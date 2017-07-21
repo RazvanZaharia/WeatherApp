@@ -1,6 +1,9 @@
 package wipro.weatherapp.utils;
 
 
+import android.content.Context;
+import android.support.annotation.NonNull;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,7 +11,11 @@ import java.util.Locale;
 
 public class Utils {
 
-    public static String formatDateToDayMonthYear(String currentDate) {
+    public static int getDrawableIdentifierByServerCode(@NonNull Context ctx, @NonNull String code) {
+        return ctx.getResources().getIdentifier("w_" + code, "drawable", ctx.getPackageName());
+    }
+
+    public static String formatDateToDayMonthYear(@NonNull String currentDate) {
         String formattedDate = null;
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
@@ -22,7 +29,7 @@ public class Utils {
         return formattedDate;
     }
 
-    public static String formatDateToHour(String currentDate) {
+    public static String formatDateToHour(@NonNull String currentDate) {
         String formattedDate = null;
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
@@ -36,7 +43,7 @@ public class Utils {
         return formattedDate;
     }
 
-    public static String formatDateMonthDay(String currentDate) {
+    public static String formatDateMonthDay(@NonNull String currentDate) {
         String formattedDate = null;
         try {
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.getDefault());
@@ -50,7 +57,7 @@ public class Utils {
         return formattedDate;
     }
 
-    public static String formatDateMonthFullDayName(String currentDate) {
+    public static String formatDateMonthFullDayName(@NonNull String currentDate) {
         String formattedDate = null;
         try {
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());

@@ -42,17 +42,19 @@ public class PresenterMainActivity extends BasePresenter<ContractMainActivity.Vi
             @Override
             public void onResponse(Call<WeatherForecastData> call, Response<WeatherForecastData> response) {
                 WeatherForecastData weatherData = response.body();
+                if (weatherData != null) {
+                    List<DayForecast> daysForecast = getForecastPerDays(weatherData);
+                    if (daysForecast == null || daysForecast.size() < 2) {
+                        getMvpView().onRequestError("Required minimum 2 days forecast");
+                    } else {
+                        getMvpView().showForecastForThisDays(daysForecast);
+                    }
 
-                List<DayForecast> daysForecast = getForecastPerDays(weatherData);
-                if (daysForecast == null || daysForecast.size() < 2) {
-                    getMvpView().onRequestError("Required minimum 2 days forecast");
+                    AppSettings.mSelectedCity = weatherData.getCity();
+                    getMvpView().setCityName(AppSettings.mSelectedCity.getName());
                 } else {
-                    getMvpView().showForecastForThisDays(daysForecast);
+                    onFailure(call, new NullPointerException("No data for this city"));
                 }
-
-                AppSettings.mSelectedCity = weatherData.getCity();
-                getMvpView().setCityName(AppSettings.mSelectedCity.getName());
-
                 getMvpView().toggleLoadingView(false);
             }
 
@@ -81,20 +83,10 @@ public class PresenterMainActivity extends BasePresenter<ContractMainActivity.Vi
         }
     }
 
-    private List<DayForecast> getForecastPerDays(WeatherForecastData forecastData) {
-        HashMap<String, List<Forecast>> mapOfForecastsByDate = new HashMap<>();
-        List<Forecast> mForecasts = forecastData.getForecastList();
-        List<DayForecast> daysForecast = new ArrayList<>();
+    private List<DayForecast> getForecastPerDays(@NonNull WeatherForecastData forecastData) {
+        HashMap<String, List<Forecast>> mapOfForecastsByDate = getMappedByDateForecasts(forecastData);
 
-        for (Forecast forecast : mForecasts) {
-            String forecastDayDate = Utils.formatDateToDayMonthYear(forecast.getDateOfCalculation());
-            List<Forecast> listOfForecastForThisDay = mapOfForecastsByDate.get(forecastDayDate);
-            if (listOfForecastForThisDay == null) {
-                listOfForecastForThisDay = new ArrayList<>();
-            }
-            listOfForecastForThisDay.add(forecast);
-            mapOfForecastsByDate.put(forecastDayDate, listOfForecastForThisDay);
-        }
+        List<DayForecast> daysForecast = new ArrayList<>();
 
         for (String date : mapOfForecastsByDate.keySet()) {
             DayForecast dayForecast = new DayForecast();
@@ -103,7 +95,12 @@ public class PresenterMainActivity extends BasePresenter<ContractMainActivity.Vi
             daysForecast.add(dayForecast);
         }
 
-        Comparator<DayForecast> comparator = new Comparator<DayForecast>() {
+        Collections.sort(daysForecast, getChronologicallySortComparator());
+        return daysForecast;
+    }
+
+    private Comparator<DayForecast> getChronologicallySortComparator() {
+        return new Comparator<DayForecast>() {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
 
             @Override
@@ -116,9 +113,21 @@ public class PresenterMainActivity extends BasePresenter<ContractMainActivity.Vi
                 return 0;
             }
         };
+    }
 
-        Collections.sort(daysForecast, comparator);
-        return daysForecast;
+    private HashMap<String, List<Forecast>> getMappedByDateForecasts(@NonNull WeatherForecastData forecastData) {
+        HashMap<String, List<Forecast>> mapOfForecastsByDate = new HashMap<>();
+        List<Forecast> mForecasts = forecastData.getForecastList();
+        for (Forecast forecast : mForecasts) {
+            String forecastDayDate = Utils.formatDateToDayMonthYear(forecast.getDateOfCalculation());
+            List<Forecast> listOfForecastForThisDay = mapOfForecastsByDate.get(forecastDayDate);
+            if (listOfForecastForThisDay == null) {
+                listOfForecastForThisDay = new ArrayList<>();
+            }
+            listOfForecastForThisDay.add(forecast);
+            mapOfForecastsByDate.put(forecastDayDate, listOfForecastForThisDay);
+        }
+        return mapOfForecastsByDate;
     }
 
 }

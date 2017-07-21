@@ -24,6 +24,8 @@ import wipro.weatherapp.ui.adapters.AdapterRvHourlyForecast;
 import wipro.weatherapp.utils.AppSettings;
 import wipro.weatherapp.utils.Utils;
 
+import static wipro.weatherapp.utils.AppSettings.mSelectedUnit;
+
 public class FragmentOneDayForecast extends Fragment {
     private static final String ARG_DAY_FORECAST = "argDayForecast";
 
@@ -75,28 +77,29 @@ public class FragmentOneDayForecast extends Fragment {
         mTvDateTime.setText(Utils.formatDateMonthDay(mDayForecast.getDayDate()));
 
         if (mDayForecast.getForecastList() != null && mDayForecast.getForecastList().size() > 0) {
-            Forecast firstForecast = mDayForecast.getForecastList().get(0);
+            int middleIndex = (mDayForecast.getForecastList().size() - 1) / 2;
+            Forecast forecastForNow = mDayForecast.getForecastList().get(0);
+            Forecast middleForecast = mDayForecast.getForecastList().get(middleIndex);
             Forecast lastForecast = mDayForecast.getForecastList().get(mDayForecast.getForecastList().size() - 1);
 
-            int maxTemp = firstForecast.getTemperature().getMaximumTemperature() > lastForecast.getTemperature().getMaximumTemperature() ?
-                    firstForecast.getTemperature().getMaximumTemperature() : lastForecast.getTemperature().getMaximumTemperature();
+            int middleForecastMaxTemp = middleForecast.getTemperature().getMaximumTemperature() > lastForecast.getTemperature().getMaximumTemperature() ?
+                    middleForecast.getTemperature().getMaximumTemperature() : lastForecast.getTemperature().getMaximumTemperature();
 
-            int minTemp = firstForecast.getTemperature().getMinimumTemperature() < lastForecast.getTemperature().getMinimumTemperature() ?
-                    firstForecast.getTemperature().getMinimumTemperature() : lastForecast.getTemperature().getMinimumTemperature();
+            int minTemp = middleForecast.getTemperature().getMinimumTemperature() < lastForecast.getTemperature().getMinimumTemperature() ?
+                    middleForecast.getTemperature().getMinimumTemperature() : lastForecast.getTemperature().getMinimumTemperature();
 
-            String maxTempS = String.format(getString(R.string.value_temperature), maxTemp, AppSettings.mSelectedUnit.mSymbol);
-            String minTempS = String.format(getString(R.string.value_temperature), minTemp, AppSettings.mSelectedUnit.mSymbol);
+            String maxTempS = String.format(getString(R.string.value_temperature), middleForecastMaxTemp, mSelectedUnit.mSymbol);
+            String minTempS = String.format(getString(R.string.value_temperature), minTemp, mSelectedUnit.mSymbol);
             mTvMinMaxTemperature.setText(String.format(getString(R.string.values_max_min), maxTempS, minTempS));
 
-            String currentTemp = String.format(getString(R.string.value_temperature), firstForecast.getTemperature().getCurrentTemperature(), AppSettings.mSelectedUnit.mSymbol);
+            String currentTemp = String.format(getString(R.string.value_temperature), forecastForNow.getTemperature().getCurrentTemperature(), AppSettings.mSelectedUnit.mSymbol);
             mTvCurrentTemperature.setText(currentTemp);
-            if (firstForecast.getWeatherConditionsList() != null
-                    && firstForecast.getWeatherConditionsList().size() > 0) {
-                mTvWeatherDescription.setText(firstForecast.getWeatherConditionsList().get(0).getDescription());
+            if (forecastForNow.getWeatherConditionsList() != null
+                    && forecastForNow.getWeatherConditionsList().size() > 0) {
+                mTvWeatherDescription.setText(forecastForNow.getWeatherConditionsList().get(0).getDescription());
+                Glide.with(getContext()).load(Utils.getDrawableIdentifierByServerCode(getContext(), forecastForNow.getWeatherConditionsList().get(0).getIconId())).into(mIvWeatherIndicator);
             }
         }
-
-        Glide.with(getContext()).load("").into(mIvWeatherIndicator);
     }
 
 }

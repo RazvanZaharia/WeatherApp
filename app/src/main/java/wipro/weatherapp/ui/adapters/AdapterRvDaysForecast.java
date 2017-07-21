@@ -4,7 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -48,6 +51,8 @@ public class AdapterRvDaysForecast extends RecyclerView.Adapter<DayForecastViewH
         TextView mTvDayTemperature;
         @BindView(R.id.tv_description)
         TextView mTvDescription;
+        @BindView(R.id.iv_weather_icon)
+        ImageView mIvWeatherIcon;
 
         public static DayForecastViewHolder newInstance(ViewGroup parent) {
             return new DayForecastViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_day_forecast, parent, false));
@@ -73,6 +78,8 @@ public class AdapterRvDaysForecast extends RecyclerView.Adapter<DayForecastViewH
                 if (middleForecast.getWeatherConditionsList() != null
                         && middleForecast.getWeatherConditionsList().size() > 0) {
                     mTvDescription.setText(middleForecast.getWeatherConditionsList().get(0).getDescription());
+                    Glide.with(itemView.getContext())
+                            .load(Utils.getDrawableIdentifierByServerCode(itemView.getContext(), middleForecast.getWeatherConditionsList().get(0).getIconId())).into(mIvWeatherIcon);
                 }
             }
         }

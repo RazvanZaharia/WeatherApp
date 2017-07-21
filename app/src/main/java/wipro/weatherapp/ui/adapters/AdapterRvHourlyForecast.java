@@ -71,7 +71,11 @@ public class AdapterRvHourlyForecast extends RecyclerView.Adapter<HourlyForecast
             mTvHourTemp.setText(String.format(itemView.getContext().getString(R.string.value_temperature),
                     forecast.getTemperature().getCurrentTemperature(), AppSettings.mSelectedUnit.mSymbol));
 
-            Glide.with(itemView.getContext()).load("").into(mIvHourWeatherIndicator);
+            if (forecast.getWeatherConditionsList() != null
+                    && forecast.getWeatherConditionsList().size() > 0) {
+                Glide.with(itemView.getContext())
+                        .load(Utils.getDrawableIdentifierByServerCode(itemView.getContext(), forecast.getWeatherConditionsList().get(0).getIconId())).into(mIvHourWeatherIndicator);
+            }
         }
     }
 }
